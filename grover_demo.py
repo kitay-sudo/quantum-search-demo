@@ -228,45 +228,45 @@ if __name__ == "__main__":
     N = 2**n
     target = random.randrange(N)
 
-    print(f"\nParametry:")
-    print(f"   Kolichestvo kubitov: {n}")
-    print(f"   Razmer prostranstva poiska: {N}")
-    print(f"   Iskomoe znachenie (target): {target}")
+    print(f"\nПараметры:")
+    print(f"   Количество кубитов: {n}")
+    print(f"   Размер пространства поиска: {N}")
+    print(f"   Искомое значение (цель): {target}")
 
     optimal_iterations = int(round((math.pi/4) * math.sqrt(N)))
-    print(f"   Optimal'noe chislo iteracij: {optimal_iterations}")
+    print(f"   Оптимальное число итераций: {optimal_iterations}")
 
-    print(f"\nZapusk algoritma Grovera...")
+    print(f"\nЗапуск алгоритма Гровера...")
     amps, probs_over_time, amps_over_time = grover(N, target, iterations=None, record=True)
     probs = np.abs(amps)**2
 
     found = int(np.argmax(probs))
-    print(f"\nRezul'taty:")
-    print(f"   Algoritm nashyol: {found}")
-    print(f"   Pravil'nyj otvet: {target}")
-    print(f"   Status: {'USPEKH' if found == target else 'OSHIBKA'}")
-    print(f"   Veroyatnost' najdennogo: {probs[found]:.4f}")
+    print(f"\nРезультаты:")
+    print(f"   Алгоритм нашёл: {found}")
+    print(f"   Правильный ответ: {target}")
+    print(f"   Статус: {'УСПЕХ' if found == target else 'ОШИБКА'}")
+    print(f"   Вероятность найденного: {probs[found]:.4f}")
 
-    print(f"\nTop-5 veroyatnostej:")
+    print(f"\nТоп-5 вероятностей:")
     for idx, p in top_k_probs(probs, 5):
         marker = ">>" if idx == target else "  "
-        print(f"   {marker} Sostoyanie {idx:>3}: {p:.4f} {'#' * int(p*40)}")
+        print(f"   {marker} Состояние {idx:>3}: {p:.4f} {'#' * int(p*40)}")
 
-    print(f"\nGeneraciya vizualizacii kvantovogo mozga...")
-    print(f"ZVUK: Chastota zvuka rastyot vmeste s veroyatnost'yu!")
-    print(f"      Nizkij ton -> nizkaya veroyatnost'")
-    print(f"      Vysokij ton -> vysokaya veroyatnost'")
+    print(f"\nГенерация визуализации квантового мозга...")
+    print(f"ЗВУК: Частота звука растёт вместе с вероятностью!")
+    print(f"      Низкий тон -> низкая вероятность")
+    print(f"      Высокий тон -> высокая вероятность")
     fig, anim = visualize_quantum_brain(N, target, probs_over_time, amps_over_time)
 
-    print(f"\nVizualizaciya gotova!")
+    print(f"\nВизуализация готова!")
 
     # Предложение сохранить GIF
     print("\n" + "="*60)
-    save_choice = input("Sokhranit' animaciyu v GIF? (da/net): ").strip().lower()
+    save_choice = input("Сохранить анимацию в GIF? (y/n): ").strip().lower()
 
     if save_choice in ['da', 'yes', 'y', 'd', 'да', 'д']:
-        print("\n🎬 Sokhranenie GIF...")
-        print("⚠️  Eto mozhet zanyat' 20-40 sekund, pozhalujsta podozhdite...")
+        print("\n🎬 Сохранение GIF...")
+        print("⚠️  Это может занять 20-40 секунд, пожалуйста подождите...")
 
         try:
             from matplotlib.animation import PillowWriter
@@ -278,17 +278,17 @@ if __name__ == "__main__":
 
             import os
             file_size = os.path.getsize(filename) / (1024 * 1024)  # MB
-            print(f"\n✓ GIF sokhranyon: {filename}")
-            print(f"  Razmer: {file_size:.1f} MB")
-            print(f"  ⚠️  ZVUK v GIF ne sokhranjaetsya (tol'ko pri prosmotre v Python)")
+            print(f"\n✓ GIF сохранён: {filename}")
+            print(f"  Размер: {file_size:.1f} MB")
+            print(f"  ⚠️  ЗВУК в GIF не сохраняется (только при просмотре в Python)")
 
         except Exception as e:
-            print(f"\n✗ Oshibka pri sokhranenii GIF: {e}")
-            print("  Poprobujte ustanovit': pip install pillow")
+            print(f"\n✗ Ошибка при сохранении GIF: {e}")
+            print("  Попробуйте установить: pip install pillow")
 
     print("\n" + "="*60)
-    print("Pokazyvayu animaciyu (so zvukom!)...")
-    print(f"Zakrojte okno grafika dlya zaversheniya programmy.")
+    print("Показываю анимацию (со звуком!)...")
+    print(f"Закройте окно графика для завершения программы.")
     print("=" * 60)
 
     # Начальный звук запуска

@@ -255,32 +255,32 @@ N = {N}
 
     # Сохранение в GIF
     if save_gif:
-        print("\nSOHRANENIE V GIF...")
+        print("\nСОХРАНЕНИЕ В GIF...")
         writer = PillowWriter(fps=2)
         filename = 'quantum_vs_classical.gif'
         anim.save(filename, writer=writer)
-        print(f"GIF sohranyon: {filename}")
+        print(f"GIF сохранён: {filename}")
 
     plt.tight_layout()
     return fig, anim
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("SRAVNENIE: KVANTOVYJ vs KLASSICHESKIJ POISK")
+    print("СРАВНЕНИЕ: КВАНТОВЫЙ vs КЛАССИЧЕСКИЙ ПОИСК")
     print("=" * 60)
 
     # Выбор размера задачи
-    print("\nVyberite razmer zadachi:")
-    print("  1. Malenkij   (16 elementov, 4 kubita)")
-    print("  2. Srednij    (64 elementa, 6 kubitov)")
-    print("  3. Bol'shoj   (256 elementov, 8 kubitov)")
-    print("  4. Ogroмnyj   (1024 elementa, 10 kubitov)")
+    print("\nВыберите размер задачи:")
+    print("  1. Маленький   (16 элементов, 4 кубита)")
+    print("  2. Средний     (64 элемента, 6 кубитов)")
+    print("  3. Большой     (256 элементов, 8 кубитов)")
+    print("  4. Огромный    (1024 элемента, 10 кубитов)")
 
     try:
-        choice = input("\nVash vybor (1-4): ").strip()
+        choice = input("\nВаш выбор (1-4): ").strip()
     except EOFError:
         choice = '1'
-        print("1 (avtomaticheski)")
+        print("1 (автоматически)")
 
     size_map = {
         '1': 4,
@@ -293,37 +293,37 @@ if __name__ == "__main__":
     N = 2**n
     target = random.randrange(N)
 
-    print(f"\nParametry:")
-    print(f"   Kubitov: {n}")
-    print(f"   Razmer:  {N}")
-    print(f"   Target:  {target}")
+    print(f"\nПараметры:")
+    print(f"   Кубитов: {n}")
+    print(f"   Размер:  {N}")
+    print(f"   Цель:    {target}")
 
     optimal = int(round((math.pi/4) * math.sqrt(N)))
-    print(f"\n   Kvantovyj:     ~{optimal} iteracij")
-    print(f"   Klassicheskij: ~{N//2} proverok (srednee)")
-    print(f"   USKORENIE:     ~{math.sqrt(N):.1f}x")
+    print(f"\n   Квантовый:     ~{optimal} итераций")
+    print(f"   Классический:  ~{N//2} проверок (среднее)")
+    print(f"   УСКОРЕНИЕ:     ~{math.sqrt(N):.1f}x")
 
-    print(f"\nZapusk algoritma Grovera...")
+    print(f"\nЗапуск алгоритма Гровера...")
     amps, probs_over_time = grover(N, target, iterations=None, record=True)
     probs = np.abs(amps)**2
 
     found = int(np.argmax(probs))
-    print(f"   Najdeno: {found}")
-    print(f"   Pravil'no: {'DA' if found == target else 'NET'}")
+    print(f"   Найдено: {found}")
+    print(f"   Правильно: {'ДА' if found == target else 'НЕТ'}")
 
     try:
-        save_choice = input("\nSohranit' GIF? (y/n): ").strip().lower()
+        save_choice = input("\nСохранить GIF? (y/n): ").strip().lower()
         save_gif = save_choice in ['y', 'yes', 'д', 'да', '1']
     except EOFError:
         save_gif = False
-        print("n (avtomaticheski)")
+        print("n (автоматически)")
 
-    print(f"\nGeneraciya vizualizacii...")
+    print(f"\nГенерация визуализации...")
     fig, anim = compare_quantum_vs_classical(N, target, probs_over_time, save_gif=save_gif)
 
     play_sound(800, 100)
-    print(f"\nSmotrite animaciyu SO ZVUKOM!")
-    print(f"(ZVUK ne sohranyaetsya v GIF, tol'ko pri prosmotre)")
+    print(f"\nСмотрите анимацию СО ЗВУКОМ!")
+    print(f"(ЗВУК не сохраняется в GIF, только при просмотре)")
     print("=" * 60)
 
     plt.show()
