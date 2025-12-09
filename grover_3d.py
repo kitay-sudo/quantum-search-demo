@@ -65,7 +65,7 @@ def create_3d_quantum_cube(N, target, probs_over_time, amps_over_time, save_gif=
     # Для 3D куба используем 8 состояний (2^3 = 8 углов куба)
     # Если N != 8, берём первые 8 или дополняем
     if N < 8:
-        print("WARNING: N < 8, dopolnyaem nul'ami")
+        print("ПРЕДУПРЕЖДЕНИЕ: N < 8, дополняем нулями")
         probs_padded = [np.pad(p, (0, 8-N), 'constant') for p in probs_over_time]
     elif N > 8:
         probs_padded = [p[:8] for p in probs_over_time]
@@ -136,7 +136,7 @@ def create_3d_quantum_cube(N, target, probs_over_time, amps_over_time, save_gif=
     text_labels = []
     for i, coord in enumerate(cube_coords):
         label = f'{i}\n({i:03b})'
-        color = 'lime' if i == target else 'yellow'
+        color = 'yellow'  # Изначально все жёлтые, зелёными станут в процессе
         txt = ax_3d.text(coord[0], coord[1], coord[2] + 0.15, label,
                   fontsize=14, ha='center', color=color, fontweight='bold',
                   bbox=dict(boxstyle='round,pad=0.3', facecolor='black', alpha=0.7, edgecolor=color))
@@ -162,11 +162,25 @@ def create_3d_quantum_cube(N, target, probs_over_time, amps_over_time, save_gif=
         temp_colors = []
         for i, p in enumerate(probs):
             if i == target:
-                # Целевая вершина: зелёная с пульсацией
-                intensity = 0.7 + 0.3 * p
-                temp_colors.append(np.array([0, intensity, 0, 0.95]))  # зелёный
+                # Целевая вершина: от синего к зелёному по мере роста вероятности
+                if p < 0.3:
+                    # Сначала синяя как все
+                    r = 0
+                    g = p * 3  # постепенно зеленеет
+                    b = 1 - p * 2
+                elif p < 0.7:
+                    # Становится зелёной
+                    r = 0
+                    g = 0.5 + p * 0.5
+                    b = max(0, 1 - p * 2)
+                else:
+                    # Яркая зелёная при высокой вероятности
+                    r = 0
+                    g = 0.8 + p * 0.2
+                    b = 0
+                temp_colors.append(np.array([r, g, b, 0.95]))
             else:
-                # Остальные: от синего к красному
+                # Остальные: от синего к жёлтому к красному
                 if p < 0.5:
                     # Синий -> Желтый
                     r = p * 2
@@ -179,6 +193,16 @@ def create_3d_quantum_cube(N, target, probs_over_time, amps_over_time, save_gif=
                     b = 0
                 temp_colors.append(np.array([r, g, b, 0.9]))
         scatter._facecolors = np.array(temp_colors)
+
+        # Обновляем цвет меток
+        for i, txt in enumerate(text_labels):
+            if i == target and probs[i] > 0.6:
+                # Метка цели становится зелёной при высокой вероятности
+                txt.set_color('lime')
+                txt.get_bbox_patch().set_edgecolor('lime')
+            else:
+                txt.set_color('yellow')
+                txt.get_bbox_patch().set_edgecolor('yellow')
 
         # Медленное вращение камеры
         rotation_angle[0] = (rotation_angle[0] + 1.5) % 360
@@ -243,13 +267,13 @@ def create_3d_quantum_cube(N, target, probs_over_time, amps_over_time, save_gif=
 
     # Сохранение в GIF
     if save_gif:
-        print("\nSOHRANENIE ANIMACII V GIF...")
-        print("Eto mozhet zanyat' 30-60 sekund...")
+        print("\nСОХРАНЕНИЕ АНИМАЦИИ В GIF...")
+        print("Это может занять 30-60 секунд...")
         writer = PillowWriter(fps=2)
         filename = 'quantum_cube_3d.gif'
         anim.save(filename, writer=writer)
-        print(f"GIF sohranyon: {filename}")
-        print(f"Razmer fajla: {get_file_size(filename)}")
+        print(f"GIF сохранён: {filename}")
+        print(f"Размер файла: {get_file_size(filename)}")
 
     # plt.tight_layout()  # Отключено из-за ручного позиционирования
     return fig, anim
@@ -264,7 +288,7 @@ def get_file_size(filename):
 
 if __name__ == "__main__":
     print("=" * 60)
-    print(">>> 3D KVANTOVYJ KUB - ALGORITM GROVERA <<<")
+    print(">>> 3D КВАНТОВЫЙ КУБ - АЛГОРИТМ ГРОВЕРА <<<")
     print("=" * 60)
 
     # Для 3D куба используем 3 кубита (8 состояний)
@@ -272,28 +296,28 @@ if __name__ == "__main__":
     N = 2**n
     target = random.randrange(N)
 
-    print(f"\nParametry:")
-    print(f"   Kolichestvo kubitov: {n}")
-    print(f"   Razmer prostranstva: {N} (uglov kuba)")
-    print(f"   Cel' (desyat.): {target}")
-    print(f"   Cel' (dvoich.):  {target:03b}")
-    print(f"   Cel' (x,y,z):    ({target&1}, {(target>>1)&1}, {(target>>2)&1})")
+    print(f"\nПараметры:")
+    print(f"   Количество кубитов: {n}")
+    print(f"   Размер пространства: {N} (углов куба)")
+    print(f"   Цель (десят.): {target}")
+    print(f"   Цель (двоич.):  {target:03b}")
+    print(f"   Цель (x,y,z):    ({target&1}, {(target>>1)&1}, {(target>>2)&1})")
 
     optimal_iterations = int(round((math.pi/4) * math.sqrt(N)))
-    print(f"   Optimal'nykh iteracij: {optimal_iterations}")
+    print(f"   Оптимальных итераций: {optimal_iterations}")
 
-    print(f"\nZapusk algoritma Grovera...")
-    print(f"   (Medlennyj rezhim dlya luchshego prosmotra)")
+    print(f"\nЗапуск алгоритма Гровера...")
+    print(f"   (Медленный режим для лучшего просмотра)")
     # МЕДЛЕННЫЙ РЕЖИМ: в 3 раза больше кадров!
     amps, probs_over_time, amps_over_time = grover(N, target, iterations=None, record=True, slow_mode=True)
     probs = np.abs(amps)**2
 
     found = int(np.argmax(probs))
-    print(f"\nRezul'taty:")
-    print(f"   Algoritm nashyol: {found}")
-    print(f"   Pravil'nyj otvet: {target}")
-    print(f"   Status: {'USPEKH' if found == target else 'OSHIBKA'}")
-    print(f"   Veroyatnost': {probs[found]:.4f}")
+    print(f"\nРезультаты:")
+    print(f"   Алгоритм нашёл: {found}")
+    print(f"   Правильный ответ: {target}")
+    print(f"   Статус: {'УСПЕХ' if found == target else 'ОШИБКА'}")
+    print(f"   Вероятность: {probs[found]:.4f}")
 
     # Спрашиваем про сохранение GIF
     print("\n" + "=" * 60)
@@ -304,18 +328,18 @@ if __name__ == "__main__":
         save_gif = False
         print("n (автоматически)")
 
-    print(f"\nGeneraciya 3D vizualizacii...")
-    print(f"   Yarkie cveta [OK]")
-    print(f"   Krupnye sfery [OK]")
-    print(f"   Medlennoe vrashchenie [OK]")
+    print(f"\nГенерация 3D визуализации...")
+    print(f"   Яркие цвета [OK]")
+    print(f"   Крупные сферы [OK]")
+    print(f"   Медленное вращение [OK]")
     fig, anim = create_3d_quantum_cube(N, target, probs_over_time, amps_over_time, save_gif=save_gif)
 
     play_quantum_sound(800, 100)
 
-    print(f"\n>>> 3D KUB VRASHCHAETSYA! <<<")
-    print(f"   SO ZVUKOM (tol'ko pri prosmotre, ne v GIF)!")
-    print(f"   Zakrojte okno dlya zaversheniya.")
-    print(f"   Kadrov: {len(probs_over_time)} (medlennyj rezhim)")
+    print(f"\n>>> 3D КУБ ВРАЩАЕТСЯ! <<<")
+    print(f"   СО ЗВУКОМ (только при просмотре, не в GIF)!")
+    print(f"   Закройте окно для завершения.")
+    print(f"   Кадров: {len(probs_over_time)} (медленный режим)")
     print("=" * 60)
 
     plt.show()
